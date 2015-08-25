@@ -63,11 +63,17 @@ public class BoundingBox {
         }
     }
 
+    public boolean contains(Point p){
+        return leftTop.x() <= p.x() && p.x() <= rightTop.x() && leftBottom.y() <= p.y() && p.y() <= leftTop.y();
+    }
+
     public Line getSplitLine(int dimension) {
         if (dimension == 0){
-            return new Line((rightTop.x() - leftTop.x()) / 2, 0);
+            return new Line(new Point((rightTop.x() + leftTop.x()) / 2, 0),
+                    new Vector(1, 0.0D));
         } else {
-            return new Line((leftTop.y() - leftBottom.y()) / 2, 0);
+            return new Line(new Point(0, (leftTop.y() + leftBottom.y()) / 2),
+                    new Vector(0.0D, 1));
         }
     }
 
