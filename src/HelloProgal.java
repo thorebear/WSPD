@@ -1,8 +1,9 @@
-import ProGAL.dataStructures.Pair;
+import ProGAL.dataStructures.Set;
 import ProGAL.geom2d.*;
 import ProGAL.geom2d.Point;
 import ProGAL.geom2d.viewer.J2DScene;
 import ProGAL.geom2d.wspd.SplitTree;
+import ProGAL.geom2d.wspd.WellSeparatedPairDecomposition;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -10,11 +11,11 @@ import java.util.List;
 
 public class HelloProgal {
 
-    public static void main(String[] args){
+    public static void main(String[] args) throws InterruptedException {
         //Generate points
-        List<Point> points = new ArrayList<>();
+        Set<Point> points = new PointSet();
         for(int i=0;i<10;i++)
-            points.add(new Point(Math.random(), Math.random()));
+            points.insert(new Point(Math.random(), Math.random()));
 
         //Display them
         J2DScene scene = J2DScene.createJ2DSceneInFrame();
@@ -27,7 +28,15 @@ public class HelloProgal {
         BoundingBox box = new BoundingBox(points);
 
         SplitTree tree = new SplitTree(points, box);
-        tree.toScene(scene);
+        // tree.toScene(scene);
+
+
+
+        WellSeparatedPairDecomposition wspd = new WellSeparatedPairDecomposition(tree, points);
+        wspd.isWellSeparated(tree.getRoot().getRightChild().getRightChild(), tree.getRoot().getLeftChild(), 1);
+
+       // tree.getRoot().getLeftChild().getBoundingBox().toScene(scene, Color.BLUE);
+       // tree.getRoot().getRightChild().getBoundingBox().toScene(scene, Color.YELLOW);
 
         scene.centerCamera();
     }

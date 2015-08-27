@@ -1,10 +1,11 @@
 package ProGAL.geom2d;
 
 import ProGAL.dataStructures.Pair;
+import ProGAL.dataStructures.Set;
 import ProGAL.geom2d.viewer.J2DScene;
-import ProGAL.geom3d.*;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class BoundingBox {
@@ -20,7 +21,7 @@ public class BoundingBox {
         this.rightBottom = rightBottom;
     }
 
-    public BoundingBox(List<Point> points) {
+    public BoundingBox(Set<Point> points) {
         double leftBound, topBound, rightBound, bottomBound;
         if(points.isEmpty()){
             throw new IllegalArgumentException(
@@ -34,7 +35,7 @@ public class BoundingBox {
         bottomBound = points.get(0).y();
 
         // Iterates through the rest of the points, to find the bounds
-        for(int i = 1; i < points.size(); i++){
+        for(int i = 1; i < points.getSize(); i++){
             Point p = points.get(i);
             leftBound = Math.min(p.x(), leftBound);
             rightBound = Math.max(p.x(), rightBound);
@@ -130,5 +131,22 @@ public class BoundingBox {
             throw new IllegalArgumentException(
                 "A bounding box can only be split by a vertical or horizontal line");
         }
+    }
+
+    public Point getLeftTop() { return leftTop; }
+    public Point getLeftBottom() { return leftBottom; }
+    public Point getRightTop() { return rightTop; }
+    public Point getRightBottom() { return rightBottom; }
+    public List<Point> getAllCorners() {
+        return new ArrayList<Point>() {{
+            add(leftTop);
+            add(leftBottom);
+            add(rightTop);
+            add(rightBottom);
+        }};
+    }
+
+    public double getMaxLength() {
+        return Math.max((rightTop.x() - leftTop.x()), (leftTop.y() - leftBottom.y()));
     }
 }

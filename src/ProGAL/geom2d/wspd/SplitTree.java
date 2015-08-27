@@ -1,9 +1,11 @@
 package ProGAL.geom2d.wspd;
 
 import ProGAL.dataStructures.Pair;
+import ProGAL.dataStructures.Set;
 import ProGAL.geom2d.BoundingBox;
 import ProGAL.geom2d.Line;
 import ProGAL.geom2d.Point;
+import ProGAL.geom2d.PointSet;
 import ProGAL.geom2d.viewer.J2DScene;
 
 import java.util.ArrayList;
@@ -13,14 +15,14 @@ public class SplitTree {
 
     private SplitTreeNode root;
 
-    public SplitTree(List<Point> points, BoundingBox rectangle) {
+    public SplitTree(Set<Point> points, BoundingBox rectangle) {
         root = calcSlowSplitTree(points, rectangle);
     }
 
-    private SplitTreeNode calcSlowSplitTree(List<Point> points, BoundingBox rectangle) {
-        if (points.size() == 1){
+    private SplitTreeNode calcSlowSplitTree(Set<Point> points, BoundingBox rectangle) {
+        if (points.getSize() == 1){
             BoundingBox boundingBox = new BoundingBox(points);
-            return new SplitTreeNode(boundingBox, rectangle);
+            return new SplitTreeNode(boundingBox, rectangle, points);
         } else {
             BoundingBox boundingBox = new BoundingBox(points);
             int i = boundingBox.getDimensionWithMaxLength();
@@ -29,23 +31,24 @@ public class SplitTree {
             BoundingBox R1 = rectanglePair.fst;
             BoundingBox R2 = rectanglePair.snd;
 
-            List<Point> S1 = new ArrayList<>();
-            List<Point> S2 = new ArrayList<>();
-
+            Set<Point> S1 = new PointSet();
+            Set<Point> S2 = new PointSet();
             for(Point p : points){
                 if (R1.contains(p)){
-                    S1.add(p);
+                    S1.insert(p);
                 } else {
-                    S2.add(p);
+                    S2.insert(p);
                 }
             }
 
             SplitTreeNode v = calcSlowSplitTree(S1, R1);
             SplitTreeNode w = calcSlowSplitTree(S2, R2);
 
-            return new SplitTreeNode(v, w, boundingBox, rectangle);
+            return new SplitTreeNode(v, w, boundingBox, rectangle, points);
         }
     }
+
+    public SplitTreeNode getRoot(){ return root; }
 
     public void toScene(J2DScene scene){
         root.toScene(scene);
