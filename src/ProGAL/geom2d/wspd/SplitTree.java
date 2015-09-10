@@ -50,6 +50,10 @@ public class SplitTree {
 
     public SplitTreeNode getRoot(){ return root; }
 
+    public List<SplitTreeNode> getAllInternalNodes() {
+        return root.getAllInternalNodes();
+    }
+
     public void toScene(J2DScene scene){
         root.toScene(scene);
     }

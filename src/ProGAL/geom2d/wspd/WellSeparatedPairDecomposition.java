@@ -4,17 +4,18 @@ import ProGAL.dataStructures.Pair;
 import ProGAL.dataStructures.Set;
 import ProGAL.geom2d.*;
 import ProGAL.geom2d.Point;
-import ProGAL.geom2d.viewer.J2DScene;
 
-import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
 
 public class WellSeparatedPairDecomposition {
-    List<Pair<Set<Point>, Set<Point>>> WSPD;
+    Set<Pair<Set<Point>, Set<Point>>> WSPD;
 
-    public WellSeparatedPairDecomposition(SplitTree tree, Set<Point> points) {
+    public WellSeparatedPairDecomposition(SplitTree tree, Set<Point> points, double s) {
+        WSPD = new Set<>();
 
+        for(SplitTreeNode node : tree.getAllInternalNodes()){
+            WSPD.append(findPairs(node.getLeftChild(), node.getRightChild(), s));
+        }
     }
 
     public Set<Pair<Set<Point>, Set<Point>>>  findPairs(SplitTreeNode v, SplitTreeNode w, double s)
@@ -81,5 +82,21 @@ public class WellSeparatedPairDecomposition {
                 (maxCircle.getRadius() + minCircle.getRadius());
 
         return distanceBetweenCircles >= s*maxCircle.getRadius();
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        for(Pair<Set<Point>, Set<Point>> pair : WSPD){
+            for(Point p : pair.fst){
+                builder.append(p.toString());
+            }
+            builder.append(" :: ");
+            for(Point p : pair.snd){
+                builder.append(p.toString());
+                builder.append(",");
+            }
+            builder.append("\n");
+        }
+        return builder.toString();
     }
 }
