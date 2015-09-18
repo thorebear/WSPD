@@ -12,7 +12,7 @@ public class HelloProgal {
     public static void main(String[] args) throws InterruptedException {
         //Generate points
         Set<Point> points = new PointSet();
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 20; i++)
             points.insert(new Point(Math.random(), Math.random()));
 
         //Display them
@@ -29,7 +29,8 @@ public class HelloProgal {
         //tree.toScene(scene);
 
         scene.centerCamera();
-        WellSeparatedPairDecomposition wspd = new WellSeparatedPairDecomposition(tree, points, 0.5);
+        WellSeparatedPairDecomposition wspd = new WellSeparatedPairDecomposition(tree, points, 50000);
+        wspd.toScene(scene);
         System.out.print(wspd.toString());
     }
 }

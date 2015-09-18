@@ -8,7 +8,6 @@ import ProGAL.geom2d.Point;
 import ProGAL.geom2d.PointSet;
 import ProGAL.geom2d.viewer.J2DScene;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class SplitTree {

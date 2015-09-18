@@ -4,7 +4,10 @@ import ProGAL.dataStructures.Pair;
 import ProGAL.dataStructures.Set;
 import ProGAL.geom2d.*;
 import ProGAL.geom2d.Point;
+import ProGAL.geom2d.viewer.J2DScene;
 
+import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class WellSeparatedPairDecomposition {
@@ -77,7 +80,6 @@ public class WellSeparatedPairDecomposition {
         minCircle.setRadius(maxCircle.getRadius());
         minCircle.translate(directionVector.scaleToLength(radiusDiff));
 
-
         double distanceBetweenCircles = maxCircle.getCenter().distance(minCircle.getCenter()) -
                 (maxCircle.getRadius() + minCircle.getRadius());
 
@@ -98,5 +100,58 @@ public class WellSeparatedPairDecomposition {
             builder.append("\n");
         }
         return builder.toString();
+    }
+
+    public void toScene(J2DScene scene)
+    {
+        // Get list of unique colors (same amount of colors as pairs)
+        int lowerLimit = 0x101010;
+        int upperLimit = 0xE0E0E0;
+        int diffBetweenColors = (upperLimit-lowerLimit)/WSPD.getSize();
+
+        final List<Integer> colors = new ArrayList<>();
+        for (int i=0; i<WSPD.getSize(); i++) {
+            colors.add(lowerLimit + diffBetweenColors * i);
+        }
+
+        for (int i=0; i<WSPD.getSize(); i++){
+            Pair<Set<Point>, Set<Point>> pair = WSPD.get(i);
+            Color color = new Color(colors.get(i));
+
+            Circle circleFst, circleSnd;
+
+            // Draw circle for the first set in the pair
+            if (pair.fst.getSize() > 1) {
+                BoundingBox box = new BoundingBox(pair.fst);
+                circleFst = new Circle(box.getLeftBottom(), box.getLeftTop(), box.getRightBottom());
+                circleFst.toScene(scene, color);
+            } else {
+                Point p = pair.fst.get(0);
+                circleFst = new Circle(p, 0.01);
+                scene.addShape(circleFst, color, 0, true);
+            }
+
+            // Draw circle for the second set in the pair
+            if (pair.snd.getSize() > 1) {
+                BoundingBox box = new BoundingBox(pair.snd);
+                circleSnd = new Circle(box.getLeftBottom(), box.getLeftTop(), box.getRightBottom());
+                circleSnd.toScene(scene, color);
+            } else {
+                Point p = pair.snd.get(0);
+                circleSnd = new Circle(p, 0.01);
+                scene.addShape(circleSnd, color, 0, true);
+            }
+
+            // Draw line between the two circles
+            Vector vector = new Vector(circleFst.getCenter(), circleSnd.getCenter());
+            vector = vector.scaleToLength(circleFst.getRadius());
+            Point fstPointOnCircle = circleFst.getCenter().add(vector);
+            vector.negative();
+            vector = vector.scaleToLength(circleSnd.getRadius());
+            Point sndPointOnCircle = circleSnd.getCenter().add(vector);
+            scene.addShape(new LineSegment(fstPointOnCircle, sndPointOnCircle), color, 0.005, false);
+
+        }
+
     }
 }
