@@ -9,10 +9,11 @@ public class HelloProgal {
         //Generate points
         Set<Point> points = new Set<>();
         for (int i = 0; i < 20; i++) {
-            points.insert(new Point(new double[]{Math.random(), Math.random()}));
+            points.insert(new Point(new double[]{Math.random(), Math.random(), Math.random(), Math.random(), Math.random(), Math.random()}));
         }
 
         BoundingBox box = new BoundingBox(points);
+        System.out.println("Num of corners: " + box.getCornerPoints().size());
 
         System.out.println(box.toString());
     }

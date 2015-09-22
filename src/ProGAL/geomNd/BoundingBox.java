@@ -5,9 +5,15 @@ import ProGAL.dataStructures.Set;
 
 import java.util.*;
 
+import static java.lang.System.arraycopy;
+
 public class BoundingBox {
 
     private List<Point> cornersPoints = new ArrayList<>();
+
+    public List<Point> getCornerPoints(){
+        return cornersPoints;
+    }
 
     public BoundingBox(Set<Point> points) {
         if(points.isEmpty()){
@@ -67,7 +73,9 @@ public class BoundingBox {
                 for(Point cornerPoint : cornersPoints)
                 {
                     // each points is splitted into two for each iteration
-                    Point newPoint = new Point(cornerPoint.getCoords());
+                    double[] newCoords = new double[dimension];
+                    arraycopy(cornerPoint.getCoords(),0, newCoords, 0, dimension);
+                    Point newPoint = new Point(newCoords);
                     newPoint.setCoord(dIndex, lowerBound);
                     cornerPoint.setCoord(dIndex, upperBound);
                     pointsToAdd.add(newPoint);
@@ -83,6 +91,7 @@ public class BoundingBox {
         for(Point point : cornersPoints)
         {
             builder.append(point.toString());
+            builder.append('\n');
         }
         return builder.toString();
     }
