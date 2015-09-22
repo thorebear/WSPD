@@ -9,8 +9,8 @@ public class HelloProgal {
     public static void main(String[] args) throws InterruptedException {
         //Generate points
         Set<Point> points = new Set<>();
-        for (int i = 0; i < 5; i++) {
-            points.insert(new Point(new double[]{Math.random(), Math.random(), Math.random()}));
+        for (int i = 0; i < 25; i++) {
+            points.insert(new Point(new double[]{Math.random(), Math.random(), Math.random(), Math.random()}));
         }
 
         BoundingBox box = new BoundingBox(points);
@@ -22,5 +22,8 @@ public class HelloProgal {
         System.out.println(boxes.fst.toString());
         System.out.println("Splitted 2: ");
         System.out.println(boxes.snd.toString());
+
+        System.out.println(boxes.fst.contains(new Point(new double[]{0.5, 0.5, 0.5, 0.5})));
+        System.out.println(boxes.snd.contains(new Point(new double[]{0.5, 0.5, 0.5, 0.5})));
     }
 }

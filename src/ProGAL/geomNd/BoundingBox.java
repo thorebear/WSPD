@@ -15,6 +15,8 @@ public class BoundingBox {
         return cornersPoints;
     }
 
+    private Map<Integer, Pair<Double, Double>> bounds = new HashMap<>();
+
     private int dimension;
 
     public BoundingBox(List<Point> cornersPoints){
@@ -23,6 +25,29 @@ public class BoundingBox {
 
         if (cornersPoints.size() != Math.pow(2,dimension)){
             throw new IllegalArgumentException("The number of corner points, doesn't fit with the dimension");
+        }
+
+        Point firstPoint = cornersPoints.get(0);
+
+        // Set init bound values, with the first point
+        for(int i = 0; i < dimension; i++)
+        {
+            bounds.put(i, new Pair<>(firstPoint.getCoord(i), firstPoint.getCoord(i)));
+        }
+
+        // Iterate through the rest of the points, and change the bounds, when a coordinate exceeds the existing bound
+        for(int pIndex = 1; pIndex < cornersPoints.size(); pIndex++){
+            Point point = cornersPoints.get(pIndex);
+            for(int dIndex = 0; dIndex < dimension; dIndex++){
+                double coordinate = point.getCoord(dIndex);
+                double lower = bounds.get(dIndex).fst;
+                double upper = bounds.get(dIndex).snd;
+                if (coordinate < lower) {
+                    bounds.put(dIndex, new Pair<>(coordinate, upper));
+                } else if (coordinate > upper) {
+                    bounds.put(dIndex, new Pair<>(lower, coordinate));
+                }
+            }
         }
     }
 
@@ -44,7 +69,6 @@ public class BoundingBox {
         }
 
         // Map each dimension to the lower and upper bound for this dimension.
-        Map<Integer, Pair<Double, Double>> bounds = new HashMap<>();
 
         // Set init bound values, with the first point
         for(int i = 0; i < dimension; i++)
@@ -149,6 +173,24 @@ public class BoundingBox {
         return new Pair<>(new BoundingBox(pointsForBB1), new BoundingBox(pointsForBB2));
     }
 
+    public boolean contains(Point p){
+        if (p.getDimensions() != dimension){
+            throw new IllegalArgumentException("Point and bounding box doesn't have the same dimension");
+        }
+
+        for(Map.Entry<Integer, Pair<Double, Double>> a : bounds.entrySet()){
+            int dim = a.getKey();
+            double lowerBound = a.getValue().fst;
+            double upperBound = a.getValue().snd;
+            double p_value = p.getCoord(dim);
+            if (p_value < lowerBound || p_value > upperBound)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public String toString(){
         StringBuilder builder = new StringBuilder();
         for(Point point : cornersPoints)
@@ -158,5 +200,4 @@ public class BoundingBox {
         }
         return builder.toString();
     }
-
 }
