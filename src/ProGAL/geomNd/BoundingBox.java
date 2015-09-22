@@ -15,6 +15,17 @@ public class BoundingBox {
         return cornersPoints;
     }
 
+    private int dimension;
+
+    public BoundingBox(List<Point> cornersPoints){
+        this.cornersPoints = cornersPoints;
+        this.dimension = cornersPoints.get(0).getDimensions();
+
+        if (cornersPoints.size() != Math.pow(2,dimension)){
+            throw new IllegalArgumentException("The number of corner points, doesn't fit with the dimension");
+        }
+    }
+
     public BoundingBox(Set<Point> points) {
         if(points.isEmpty()){
             throw new IllegalArgumentException(
@@ -22,7 +33,7 @@ public class BoundingBox {
         }
 
         Point firstPoint = points.get(0);
-        int dimension = firstPoint.getDimensions();
+        this.dimension = firstPoint.getDimensions();
 
         // Test that all points have the same dimensions.
         for(int i = 1; i < points.getSize(); i++){
@@ -84,6 +95,58 @@ public class BoundingBox {
                 cornersPoints.addAll(pointsToAdd);
             }
         }
+    }
+
+    public int getDimensionWithMaxLength(){
+        double maxLength = -1;
+        int maxDim = -1;
+        for(int i = 0; i < dimension; i++){
+            Point p1 = cornersPoints.get(0);
+            for(int j = 1; j < cornersPoints.size(); j++) {
+                Point p2 = cornersPoints.get(j);
+                double diff = Math.abs(p1.getCoord(i) - p2.getCoord(i));
+                if (diff > maxLength) {
+                    maxLength = diff;
+                    maxDim = i;
+                }
+            }
+        }
+        return maxDim;
+    }
+
+    public Pair<BoundingBox, BoundingBox> split(int splitDimension) {
+        // Getting the "middle" of the box in the split dimension
+        Point p1 = cornersPoints.get(0);
+        double middle = -1;
+        for(int i = 1; i < cornersPoints.size(); i++){
+            Point p2 = cornersPoints.get(i);
+            // We only need one pair of points, which differ in the splitting dimension
+            if (p1.getCoord(splitDimension) != p2.getCoord(splitDimension)){
+                middle = Math.abs(p1.getCoord(splitDimension) - p2.getCoord(splitDimension)) / 2;
+                break;
+            }
+        }
+
+        List<Point> pointsForBB1 = new ArrayList<>();
+        List<Point> pointsForBB2 = new ArrayList<>();
+
+        for(Point p : cornersPoints){
+            if (p.getCoord(splitDimension) < middle){
+                pointsForBB1.add(p.clone());
+                Point np = p.clone();
+                np.setCoord(splitDimension, middle);
+                pointsForBB2.add(np);
+            } else {
+                pointsForBB2.add(p.clone());
+                Point np = p.clone();
+                np.setCoord(splitDimension, middle);
+                pointsForBB1.add(np);
+            }
+        }
+
+        System.out.println(middle);
+
+        return new Pair<>(new BoundingBox(pointsForBB1), new BoundingBox(pointsForBB2));
     }
 
     public String toString(){
