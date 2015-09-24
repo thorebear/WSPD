@@ -165,8 +165,6 @@ public class BoundingBox {
             }
         }
 
-        System.out.println(middle);
-
         return new Pair<>(new BoundingBox(pointsForBB1), new BoundingBox(pointsForBB2));
     }
 
