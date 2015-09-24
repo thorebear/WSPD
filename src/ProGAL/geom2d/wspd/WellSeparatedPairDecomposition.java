@@ -13,7 +13,7 @@ import java.util.List;
 public class WellSeparatedPairDecomposition {
     Set<Pair<Set<Point>, Set<Point>>> WSPD;
 
-    public WellSeparatedPairDecomposition(SplitTree tree, Set<Point> points, double s) {
+    public WellSeparatedPairDecomposition(SplitTree tree, double s) {
         WSPD = new Set<>();
 
         for(SplitTreeNode node : tree.getAllInternalNodes()){
@@ -53,37 +53,12 @@ public class WellSeparatedPairDecomposition {
         BoundingBox box_w = w.getBoundingBox();
         Circle c_w = new Circle(box_w.getLeftBottom(), box_w.getLeftTop(), box_w.getRightBottom());
 
-        Circle minCircle, maxCircle;
+        double distanceBetweenCircles = c_v.getCenter().distance(c_w.getCenter()) -
+                (c_v.getRadius() + c_w.getRadius());
 
-        BoundingBox minBox;
-        if (c_v.getRadius() > c_w.getRadius()){
-            minCircle = c_w;
-            maxCircle = c_v;
-            minBox = box_w;
-        } else {
-            minCircle = c_v;
-            maxCircle = c_w;
-            minBox = box_v;
-        }
+        double maxRadius = Math.max(c_w.getRadius(), c_v.getRadius());
 
-        List<Point> allCorners = minBox.getAllCorners();
-        Point minDistanceToOtherCenterPoint = allCorners.remove(0);
-        for (Point p : allCorners)
-        {
-            if (p.distance(maxCircle.getCenter()) < minDistanceToOtherCenterPoint.distance(maxCircle.getCenter())){
-                minDistanceToOtherCenterPoint = p;
-            }
-        }
-
-        Vector directionVector = new Vector(maxCircle.getCenter(), minCircle.getCenter());
-        double radiusDiff = maxCircle.getRadius() - minCircle.getRadius();
-        minCircle.setRadius(maxCircle.getRadius());
-        minCircle.translate(directionVector.scaleToLength(radiusDiff));
-
-        double distanceBetweenCircles = maxCircle.getCenter().distance(minCircle.getCenter()) -
-                (maxCircle.getRadius() + minCircle.getRadius());
-
-        return distanceBetweenCircles >= s*maxCircle.getRadius();
+        return distanceBetweenCircles >= s*maxRadius;
     }
 
     public String toString() {
@@ -150,7 +125,6 @@ public class WellSeparatedPairDecomposition {
             vector = vector.scaleToLength(circleSnd.getRadius());
             Point sndPointOnCircle = circleSnd.getCenter().add(vector);
             scene.addShape(new LineSegment(fstPointOnCircle, sndPointOnCircle), color, 0.005, false);
-
         }
 
     }

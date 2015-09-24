@@ -138,19 +138,16 @@ public class BoundingBox {
         return maxDim;
     }
 
-    public Pair<BoundingBox, BoundingBox> split(int splitDimension) {
+    public double getMiddleInDimension(int dimension) {
         // Getting the "middle" of the box in the split dimension
+        // The first and the last element is different in every dimension, so we just use this pair to find the middle
         Point p1 = cornersPoints.get(0);
-        double middle = -1;
-        for(int i = 1; i < cornersPoints.size(); i++){
-            Point p2 = cornersPoints.get(i);
-            // We only need one pair of points, which differ in the splitting dimension
-            if (p1.getCoord(splitDimension) != p2.getCoord(splitDimension)){
-                middle = Math.abs(p1.getCoord(splitDimension) - p2.getCoord(splitDimension)) / 2;
-                break;
-            }
-        }
+        Point p2 = cornersPoints.get(cornersPoints.size() - 1);
+        return Math.min(p1.getCoord(dimension), p2.getCoord(dimension)) +
+                Math.abs(p1.getCoord(dimension) - p2.getCoord(dimension)) / 2;
+    }
 
+    public Pair<BoundingBox, BoundingBox> split(int splitDimension, double middle) {
         List<Point> pointsForBB1 = new ArrayList<>();
         List<Point> pointsForBB2 = new ArrayList<>();
 
@@ -199,5 +196,25 @@ public class BoundingBox {
             builder.append('\n');
         }
         return builder.toString();
+    }
+
+    public double getMaxLength() {
+        int maxDim = getDimensionWithMaxLength();
+        Pair<Double,Double> lowerUpper = bounds.get(maxDim);
+        return lowerUpper.snd - lowerUpper.fst;
+    }
+
+    /*
+    Returns the point, which has equal distance to both 'sides' of the box in each dimension.
+     */
+    public Point getCenterPoint() {
+        double[] centerCoords = new double[dimension];
+        for(int d = 0; d < dimension; d++)
+        {
+            Pair<Double, Double> lowerUpper = bounds.get(d);
+            centerCoords[d] = lowerUpper.fst + ((lowerUpper.snd - lowerUpper.fst) / 2);
+        }
+
+        return new Point(centerCoords);
     }
 }

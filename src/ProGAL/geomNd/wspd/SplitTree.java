@@ -1,12 +1,9 @@
-package ProGAL.geom2d.wspd;
+package ProGAL.geomNd.wspd;
 
 import ProGAL.dataStructures.Pair;
 import ProGAL.dataStructures.Set;
-import ProGAL.geom2d.BoundingBox;
-import ProGAL.geom2d.Line;
-import ProGAL.geom2d.Point;
-import ProGAL.geom2d.PointSet;
-import ProGAL.geom2d.viewer.J2DScene;
+import ProGAL.geomNd.BoundingBox;
+import ProGAL.geomNd.Point;
 
 import java.util.List;
 
@@ -24,13 +21,13 @@ public class SplitTree {
             return new SplitTreeNode(boundingBox, rectangle, points);
         } else {
             int i = boundingBox.getDimensionWithMaxLength();
-            Line splitLine = boundingBox.getSplitLine(i);
-            Pair<BoundingBox, BoundingBox> rectanglePair = rectangle.split(splitLine);
+            double whereToSplit = boundingBox.getMiddleInDimension(i);
+            Pair<BoundingBox, BoundingBox> rectanglePair = rectangle.split(i, whereToSplit);
             BoundingBox R1 = rectanglePair.fst;
             BoundingBox R2 = rectanglePair.snd;
 
-            Set<Point> S1 = new PointSet();
-            Set<Point> S2 = new PointSet();
+            Set<Point> S1 = new Set<>();
+            Set<Point> S2 = new Set<>();
             for(Point p : points){
                 if (R1.contains(p)){
                     S1.insert(p);
@@ -46,13 +43,6 @@ public class SplitTree {
         }
     }
 
-    public SplitTreeNode getRoot(){ return root; }
+    public List<SplitTreeNode> getAllInternalNodes() { return root.getAllInternalNodes(); }
 
-    public List<SplitTreeNode> getAllInternalNodes() {
-        return root.getAllInternalNodes();
-    }
-
-    public void toScene(J2DScene scene){
-        root.toScene(scene);
-    }
 }
