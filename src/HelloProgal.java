@@ -14,7 +14,7 @@ import java.awt.*;
 public class HelloProgal {
 
     public static void main(String[] args) throws InterruptedException {
-        test2DimensionWSPD();
+        //test2DimensionWSPD();
         testNDimensionWSPD();
     }
 
@@ -26,8 +26,8 @@ public class HelloProgal {
         }
 
         SplitTree splitTree = new SplitTree(points, new BoundingBox(points));
-        WellSeparatedPairDecomposition wspd = new WellSeparatedPairDecomposition(splitTree, 0.3);
-        System.out.print(wspd.toString());
+        //WellSeparatedPairDecomposition wspd = new WellSeparatedPairDecomposition(splitTree, 0.3);
+        //System.out.print(wspd.toString());
     }
 
     private static void test2DimensionWSPD() {
