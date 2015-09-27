@@ -4,6 +4,7 @@ import ProGAL.dataStructures.*;
 import ProGAL.geomNd.BoundingBox;
 import ProGAL.geomNd.Point;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -120,6 +121,9 @@ public class SplitTree {
     }
 
     private class PartialSplitTree {
+
+        private PartialSplitTreeNode root;
+
         public PartialSplitTree(Set<Point> points, BoundingBox rectangle, Map<Integer, Set<PointWrapper>> LS) {
             int dimension = points.get(0).getDimensions();
 
@@ -128,6 +132,7 @@ public class SplitTree {
             int size = n;
 
             PartialSplitTreeNode u = new PartialSplitTreeNode(rectangle);
+            root = u;
 
             Map<Integer, Set<PointWrapper>> CLS = new HashMap<>();
 
@@ -169,6 +174,7 @@ public class SplitTree {
             while (size > n / 2) {
                 /// STEP 3: ///
                 BoundingBox boundingBox_u = new BoundingBox(points);
+                u.setBoundingBox(boundingBox_u);
                 int i = boundingBox_u.getDimensionWithMaxLength();
                 double middle = boundingBox_u.getMiddleInDimension(i);
                 Set<PointWrapper> LS_u_i = LS.get(i);
@@ -199,17 +205,20 @@ public class SplitTree {
                 if (p_prime.getPoint().getCoord(i) >= middle) {
                     /// STEP 4: ///
                     boolean p_encounted = false;
-                    int index = 0;
-                    while(!p_encounted){
-                        PointWrapper z = LS_u_i.get(index);
+                    PointWrapper z = LS_u_i.getFirst();
+                    while (!p_encounted) {
 
-                        for(PointWrapper pw : z.CrossPointers.values()){
+                        System.out.println(z.CrossPointers.values().size());
+                        for (PointWrapper pw : z.CrossPointers.values()) {
                             pw.Copy.Node = v;
                         }
 
                         z.Copy.Node = v;
 
-                        for(int di = 0; di < z.CrossPointers.size(); di++){
+                        for (int di = 0; di < z.CrossPointers.size(); di++) {
+                            if (di == i)
+                                continue;
+
                             PointWrapper crossPointer = z.CrossPointers.get(di);
                             Set<PointWrapper> LS_u_j = LS.get(di);
                             LS_u_j.delete(crossPointer);
@@ -217,12 +226,12 @@ public class SplitTree {
 
                         LS_u_i.delete(z);
 
-                        if (z.equals(p)){
+                        if (z.equals(p)) {
                             p_encounted = true;
                         } else {
                             z = z.Next;
                         }
-                        index++;
+
                     }
 
                     u = w;
@@ -231,17 +240,15 @@ public class SplitTree {
                 } else {
                     /// STEP 5: ///
                     boolean q_encounted = false;
-                    int index = LS_u_i.getSize();
-                    while(!q_encounted){
-                        PointWrapper z = LS_u_i.get(index);
-
-                        for(PointWrapper pw : z.CrossPointers.values()){
+                    PointWrapper z = LS_u_i.getLast();
+                    while (!q_encounted) {
+                        for (PointWrapper pw : z.CrossPointers.values()) {
                             pw.Copy.Node = v;
                         }
 
                         z.Copy.Node = v;
 
-                        for(int di = 0; di < z.CrossPointers.size(); di++){
+                        for (int di = 0; di < z.CrossPointers.size(); di++) {
                             PointWrapper crossPointer = z.CrossPointers.get(di);
                             Set<PointWrapper> LS_u_j = LS.get(di);
                             LS_u_j.delete(crossPointer);
@@ -249,27 +256,122 @@ public class SplitTree {
 
                         LS_u_i.delete(z);
 
-                        if(z.equals(q)){
+                        if (z.equals(q)) {
                             q_encounted = true;
                         } else {
                             q = q.Prev;
                         }
-
-                        index--;
                     }
 
+                    u = w;
 
+                    size = size - size_prime;
                 }
             }
 
-            /// STEP 2: ///
+            /// STEP 2: (size is now < n/2) ///
+            for (int d = 0; d < dimension; d++) {
+                Set<PointWrapper> LS_u_d = LS.get(d);
+                for (PointWrapper pw : LS_u_d) {
+                    pw.Copy.Node = u;
+                }
+            }
 
+            /// STEP 6: ///
+            List<PartialSplitTreeNode> leafs = getLeafs(root);
+
+            Map<PartialSplitTreeNode, Map<Integer, Set<PointWrapper>>> LS_leafs = new HashMap<>();
+            for (PartialSplitTreeNode leaf : leafs) {
+                Map<Integer, Set<PointWrapper>> LS_leaf = new HashMap<>();
+                for (int di = 0; di < dimension; di++) {
+                    Set<PointWrapper> LS_leaf_d = LS_leaf.put(di, new Set<>());
+                }
+                LS_leafs.put(leaf, LS_leaf);
+            }
+
+            for (int d = 0; d < dimension; d++) {
+                for (int pi = 0; pi < CLS.get(d).getSize(); pi++) {
+                    PointWrapper pw = CLS.get(d).get(pi);
+                    Map<Integer, Set<PointWrapper>> LS_leaf = LS_leafs.get(pw.Node);
+                    Set<PointWrapper> LS_leaf_d = LS_leaf.get(d);
+                    PointWrapper newPW = new PointWrapper(new Point(pw.getPoint().getCoords().clone()));
+                    LS_leaf_d.insert(newPW);
+                    int indexInsert = LS_leaf_d.getSize() - 1;
+                    for (int di = 0; di < d; di++) {
+                        System.out.println("DEBUG: " + d + " ind: " + indexInsert + " Size: " + LS_leaf.get(di).getSize());
+                        PointWrapper other = LS_leaf.get(di).get(indexInsert);
+                        // Add cross pointer in both directions:
+                        other.CrossPointers.put(d, pw);
+                        pw.CrossPointers.put(di, other);
+                    }
+                }
+            }
+
+            for (Map<Integer, Set<PointWrapper>> LS_leaf : LS_leafs.values()) {
+                for (int d = 0; d < dimension; d++) {
+                    Set<PointWrapper> points_d = LS_leaf.get(d);
+
+                    for (int pi = 0; pi < points_d.getSize(); pi++) {
+                        if (pi > 0) {
+                            points_d.get(pi).Prev = points_d.get(pi - 1);
+                        }
+                        if (pi < points_d.getSize() - 1) {
+                            points_d.get(pi).Next = points_d.get(pi + 1);
+                        }
+                    }
+
+                    LS_leaf.put(d, points_d);
+                }
+            }
+
+            // finally for each leaf compute the bounding box
+            for(int leaf_index = 0; leaf_index < leafs.size(); leaf_index++){
+                PartialSplitTreeNode leaf = leafs.get(leaf_index);
+                Map<Integer, Set<PointWrapper>> LS_leaf = LS_leafs.get(leaf);
+
+                // Since the points are sorted, we only need the first and the last point in each dimension,
+                // to compute the bounding box:
+                Set<Point> pointsNeedForBB = new Set<>();
+                for(int d = 0; d < dimension; d++){
+                    pointsNeedForBB.insert(LS_leaf.get(d).getFirst().getPoint());
+                    pointsNeedForBB.insert(LS_leaf.get(d).getLast().getPoint());
+                }
+                leaf.setBoundingBox(new BoundingBox(pointsNeedForBB));
+            }
+        }
+
+        private List<PartialSplitTreeNode> getLeafs(PartialSplitTreeNode root) {
+            PartialSplitTreeNode a = root;
+            List<PartialSplitTreeNode> leafs = new ArrayList<>();
+
+            List<PartialSplitTreeNode> layer = new ArrayList<>();
+            layer.add(a);
+            while(!layer.isEmpty()) {
+                List<PartialSplitTreeNode> newLayer = new ArrayList<>();
+                for (PartialSplitTreeNode node : layer) {
+                    if (node.leftChild != null){
+                        newLayer.add(node.leftChild);
+                    }
+                    if (node.rightChild != null){
+                        newLayer.add(node.rightChild);
+                    }
+
+                    if (node.leftChild == null && node.rightChild == null){
+                        leafs.add(node);
+                    }
+                }
+
+                layer = newLayer;
+            }
+
+            return leafs;
         }
 
         private class PartialSplitTreeNode {
             private final BoundingBox rectangle;
             private PartialSplitTreeNode rightChild;
             private PartialSplitTreeNode leftChild;
+            private BoundingBox boundingBox;
 
             public PartialSplitTreeNode(BoundingBox rectangle) {
                 this.rectangle = rectangle;
@@ -281,6 +383,10 @@ public class SplitTree {
 
             public void setRightChild(PartialSplitTreeNode rightChild) {
                 this.rightChild = rightChild;
+            }
+
+            public void setBoundingBox(BoundingBox boundingBox) {
+                this.boundingBox = boundingBox;
             }
         }
     }

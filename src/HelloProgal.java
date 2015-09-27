@@ -21,8 +21,8 @@ public class HelloProgal {
     private static void testNDimensionWSPD() {
         //Generate points
         Set<Point> points = new Set<>();
-        for (int i = 0; i < 29; i++) {
-            points.insert(new Point(new double[]{Math.random(), Math.random(),Math.random(), Math.random(),Math.random(), Math.random(), Math.random()}));
+        for (int i = 0; i < 4; i++) {
+            points.insert(new Point(new double[]{Math.random(), Math.random()}));
         }
 
         SplitTree splitTree = new SplitTree(points, new BoundingBox(points));
@@ -32,7 +32,7 @@ public class HelloProgal {
 
     private static void test2DimensionWSPD() {
         Set<ProGAL.geom2d.Point> points = new PointSet();
-        for (int i = 0; i < 20; i++)
+        for (int i = 0; i < 4; i++)
             points.insert(new ProGAL.geom2d.Point(Math.random(), Math.random()));
 
         //Display them
