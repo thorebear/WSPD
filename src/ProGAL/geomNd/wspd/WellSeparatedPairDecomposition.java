@@ -7,7 +7,7 @@ import ProGAL.geomNd.HyperSphere;
 import ProGAL.geomNd.Point;
 
 public class WellSeparatedPairDecomposition {
-    Set<Pair<Set<Point>, Set<Point>>> WSPD;
+    public Set<Pair<Set<Point>, Set<Point>>> WSPD;
 
     public WellSeparatedPairDecomposition(SplitTree tree, double s) {
         WSPD = new Set<>();
