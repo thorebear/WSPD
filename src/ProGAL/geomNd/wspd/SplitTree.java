@@ -145,6 +145,8 @@ public class SplitTree {
                     CLS_d.insert(pw);
 
                     // Insert pw as cross pointer in the same 'point' in all the other lists (which are initilized)
+                    // TODO THIS IS A BUG, THE POINTS ARE SORTED DIFFENT, SO THIS POINTS WONT HAVE THE SAME INDEX,
+                    // TODO IN THE DIFFRENT LISTS
                     for (int di = 0; di < d; di++) {
                         PointWrapper other = CLS.get(di).get(pi);
                         // Add cross pointer in both directions:
@@ -173,16 +175,30 @@ public class SplitTree {
 
             while (size > n / 2) {
                 /// STEP 3: ///
-                BoundingBox boundingBox_u = new BoundingBox(points);
+                // Since the points are sorted, we only need the first and the last point in each dimension,
+                // to compute the bounding box:
+                Set<Point> pointsNeedForBB = new Set<>();
+                for(int d = 0; d < dimension; d++){
+                    pointsNeedForBB.insert(LS.get(d).getFirst().getPoint());
+                    pointsNeedForBB.insert(LS.get(d).getLast().getPoint());
+                }
+                BoundingBox boundingBox_u = new BoundingBox(pointsNeedForBB);
                 u.setBoundingBox(boundingBox_u);
+
                 int i = boundingBox_u.getDimensionWithMaxLength();
+                System.out.println("Max index " + i);
                 double middle = boundingBox_u.getMiddleInDimension(i);
+                System.out.println("SIZE: " + size);
                 Set<PointWrapper> LS_u_i = LS.get(i);
                 PointWrapper p = LS_u_i.getFirst();
                 PointWrapper p_prime = p.Next;
                 PointWrapper q = LS_u_i.getLast();
                 PointWrapper q_prime = q.Prev;
                 int size_prime = 1;
+                System.out.println("is null ? P_prime = " + (p_prime == null));
+                System.out.println("is null ? Q_prime = " + (q_prime == null));
+                System.out.println("is null ? P_prime.getpoint = " + (p_prime.getPoint() == null));
+                System.out.println("is null ? Q_prime.getpoint = " + (q_prime.getPoint() == null));
                 while (p_prime.getPoint().getCoord(i) <= middle
                         && q_prime.getPoint().getCoord(i) >= middle) {
                     p = p_prime;
@@ -242,18 +258,23 @@ public class SplitTree {
                     boolean q_encounted = false;
                     PointWrapper z = LS_u_i.getLast();
                     while (!q_encounted) {
+                        // 5.1
                         for (PointWrapper pw : z.CrossPointers.values()) {
-                            pw.Copy.Node = v;
+                            pw.Copy.Node = w;
                         }
 
-                        z.Copy.Node = v;
+                        z.Copy.Node = w;
 
+                        // 5.2
                         for (int di = 0; di < z.CrossPointers.size(); di++) {
+                            if (di == i)
+                                continue;
                             PointWrapper crossPointer = z.CrossPointers.get(di);
                             Set<PointWrapper> LS_u_j = LS.get(di);
                             LS_u_j.delete(crossPointer);
                         }
 
+                        // 5.3
                         LS_u_i.delete(z);
 
                         if (z.equals(q)) {
@@ -263,7 +284,7 @@ public class SplitTree {
                         }
                     }
 
-                    u = w;
+                    u = v;
 
                     size = size - size_prime;
                 }
@@ -297,6 +318,9 @@ public class SplitTree {
                     PointWrapper newPW = new PointWrapper(new Point(pw.getPoint().getCoords().clone()));
                     LS_leaf_d.insert(newPW);
                     int indexInsert = LS_leaf_d.getSize() - 1;
+
+                    // TODO BUG WE CANNOT INSERT CROSS POINTERS LIKE THIS, BECAUSE WE HAVE TO ADD ALL THE POINTS FIRST,
+                    // TODO BECAUSE THEY COME IS DIFFERENT RÆKKEFØLGE - since they are sorted different.
                     for (int di = 0; di < d; di++) {
                         System.out.println("DEBUG: " + d + " ind: " + indexInsert + " Size: " + LS_leaf.get(di).getSize());
                         PointWrapper other = LS_leaf.get(di).get(indexInsert);
