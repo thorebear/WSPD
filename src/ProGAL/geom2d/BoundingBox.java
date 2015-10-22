@@ -50,10 +50,11 @@ public class BoundingBox {
     }
 
     public void toScene(J2DScene scene, Color col) {
-        scene.addShape(new LineSegment(leftTop, leftBottom), col);
-        scene.addShape(new LineSegment(rightTop, rightBottom), col);
-        scene.addShape(new LineSegment(leftTop, rightTop), col);
-        scene.addShape(new LineSegment(leftBottom, rightBottom), col);
+        double thick = 0.003;
+        scene.addShape(new LineSegment(leftTop, leftBottom), col, thick);
+        scene.addShape(new LineSegment(rightTop, rightBottom), col, thick);
+        scene.addShape(new LineSegment(leftTop, rightTop), col, thick);
+        scene.addShape(new LineSegment(leftBottom, rightBottom), col, thick);
     }
 
     public int getDimensionWithMaxLength(){

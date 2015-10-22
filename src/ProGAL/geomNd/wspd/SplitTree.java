@@ -107,7 +107,6 @@ public class SplitTree {
         private PointWrapper Prev;
         private PointWrapper Next;
         private Map<Integer, PointWrapper> CrossPointers;
-        private PointWrapper PointsInLS;
         private PointWrapper Copy;
         private PartialSplitTree.PartialSplitTreeNode Node;
 
@@ -143,16 +142,15 @@ public class SplitTree {
                 for (int pi = 0; pi < LS_d.getSize(); pi++) {
                     Point p = LS_d.get(pi).getPoint();
                     PointWrapper pw = new PointWrapper(new Point(p.getCoords().clone()));
-                    pw.PointsInLS = LS_d.get(pi);
                     CLS_d.insert(pw);
 
                     // Insert pw as cross pointer in the same 'point' in all the other lists (which are initilized)
-//                    for (int di = 0; di < d; di++) {
-//                        PointWrapper other = CLS.get(di).get(pi);
-//                        // Add cross pointer in both directions:
-//                        other.CrossPointers.put(d, pw);
-//                        pw.CrossPointers.put(di, other);
-//                    }
+                    for (int di = 0; di < d; di++) {
+                        PointWrapper other = CLS.get(di).get(pi);
+                        // Add cross pointer in both directions:
+                        other.CrossPointers.put(d, pw);
+                        pw.CrossPointers.put(di, other);
+                    }
 
                     // Set cross pointer to copy of point in CLS:
                     LS_d.get(pi).Copy = pw;
@@ -211,15 +209,12 @@ public class SplitTree {
                     while (!p_encounted) {
 
                         System.out.println(z.CrossPointers.values().size());
-
-                        // Step 4.1
                         for (PointWrapper pw : z.CrossPointers.values()) {
                             pw.Copy.Node = v;
                         }
 
                         z.Copy.Node = v;
 
-                        // Step 4.2
                         for (int di = 0; di < z.CrossPointers.size(); di++) {
                             if (di == i)
                                 continue;
@@ -229,7 +224,6 @@ public class SplitTree {
                             LS_u_j.delete(crossPointer);
                         }
 
-                        // Step 4.3
                         LS_u_i.delete(z);
 
                         if (z.equals(p)) {
