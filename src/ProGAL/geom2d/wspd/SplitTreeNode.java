@@ -52,15 +52,21 @@ public class SplitTreeNode {
 
     public Set<Point> getPoints() { return points; }
 
-    public void toScene(J2DScene scene) {
-        boundingBox.toScene(scene, Color.BLACK);
-        rectangle.toScene(scene, Color.BLUE);
+    public void toScene(J2DScene scene, Color color) {
+//        Color nxtLevelColor = new Color((int)(Math.random() * 0x1000000));
+//        if (leftChild != null)
+//            leftChild.toScene(scene, nxtLevelColor);
+//
+//        if (rightChild != null)
+//            rightChild.toScene(scene, nxtLevelColor);
 
-        if (leftChild != null)
-            leftChild.toScene(scene);
+        boundingBox.toScene(scene, color);
+        rectangle.toScene(scene, color);
 
-        if (rightChild != null)
-            rightChild.toScene(scene);
+        rectangle.getSplitLine(rectangle.getDimensionWithMaxLength()).toScene(scene, 3,Color.GRAY, 0.01);
+
+        rightChild.boundingBox.toScene(scene, color);
+        leftChild.boundingBox.toScene(scene, color);
     }
 
     // Gets all internal nodes in the subtree with root in this node.

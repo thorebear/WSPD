@@ -8,6 +8,7 @@ import ProGAL.geom2d.Point;
 import ProGAL.geom2d.PointSet;
 import ProGAL.geom2d.viewer.J2DScene;
 
+import java.awt.*;
 import java.util.List;
 
 public class SplitTree {
@@ -53,6 +54,6 @@ public class SplitTree {
     }
 
     public void toScene(J2DScene scene){
-        root.toScene(scene);
+        root.toScene(scene, Color.BLACK);
     }
 }

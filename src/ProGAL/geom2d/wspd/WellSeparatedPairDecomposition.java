@@ -9,6 +9,7 @@ import ProGAL.geom2d.viewer.J2DScene;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class WellSeparatedPairDecomposition {
     Set<Pair<Set<Point>, Set<Point>>> WSPD;
@@ -127,5 +128,17 @@ public class WellSeparatedPairDecomposition {
             scene.addShape(new LineSegment(fstPointOnCircle, sndPointOnCircle), color, 0.005, false);
         }
 
+    }
+
+    public void addTSpannerToScene(J2DScene scene){
+        for(Pair<Set<Point>,Set<Point>> pair : WSPD){
+            Set<Point> A = pair.fst;
+            Set<Point> B = pair.snd;
+
+            Point p_a = A.get((new Random()).nextInt(A.getSize()));
+            Point p_b = B.get((new Random()).nextInt(B.getSize()));
+
+            scene.addShape(new LineSegment(p_a, p_b), Color.BLACK, 0.005);
+        }
     }
 }
