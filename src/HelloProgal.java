@@ -21,13 +21,8 @@ public class HelloProgal {
     private static void testNDimensionWSPD() {
         //Generate points
         Set<Point> points = new Set<>();
-        for (int i = 0; i < 2; i++) {
-            points.insert(new Point(new double[]{Math.random(),Math.random()}));
-        }
-
-        System.out.println("Points: ");
-        for(Point p : points){
-            System.out.println(p.toString());
+        for (int i = 0; i < 20000; i++) {
+            points.insert(new Point(new double[]{Math.random(),Math.random(),Math.random(),Math.random(),Math.random(),Math.random()}));
         }
 
         SplitTree splitTree = new SplitTree(points, new BoundingBox(points));

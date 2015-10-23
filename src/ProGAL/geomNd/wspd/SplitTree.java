@@ -198,7 +198,6 @@ public class SplitTree {
             }
 
             while (size > n / 2) {
-                System.out.println("heeey");
                 /// STEP 3: ///
                 BoundingBox boundingBox_u = new BoundingBox(points);
                 u.setBoundingBox(boundingBox_u);
@@ -233,8 +232,6 @@ public class SplitTree {
                     boolean p_encounted = false;
                     PointWrapper z = LS.get(i).fst;
                     while (!p_encounted) {
-
-                        System.out.println("#CrossPointers: " + z.CrossPointers.values().size());
                         for (PointWrapper pw : z.CrossPointers.values()) {
                             pw.Copy.setNode(v);
                         }
@@ -248,7 +245,7 @@ public class SplitTree {
                                 continue;
 
                             PointWrapper crossPointer = z.CrossPointers.get(di);
-                            crossPointer.deleteInList(LS,i);
+                            crossPointer.deleteInList(LS,di);
                         }
 
                         z.deleteInList(LS, i);
@@ -270,7 +267,6 @@ public class SplitTree {
                     PointWrapper z = LS.get(i).snd;
                     while (!q_encounted) {
 
-                        System.out.println("#CrossPointers: " + z.CrossPointers.values().size());
                         for (PointWrapper pw : z.CrossPointers.values()) {
                             pw.Copy.setNode(w);
                         }
@@ -360,7 +356,6 @@ public class SplitTree {
                 // to compute the bounding box:
                 Set<Point> pointsNeedForBB = new Set<>();
                 for(int d = 0; d < dimension; d++){
-                    System.out.println("D: " + d);
                     pointsNeedForBB.insert(LS_leaf.get(d).getFirst().getPoint());
                     pointsNeedForBB.insert(LS_leaf.get(d).getLast().getPoint());
                 }
