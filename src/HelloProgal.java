@@ -14,15 +14,20 @@ import java.awt.*;
 public class HelloProgal {
 
     public static void main(String[] args) throws InterruptedException {
-        test2DimensionWSPD();
-        //testNDimensionWSPD();
+        //test2DimensionWSPD();
+        testNDimensionWSPD();
     }
 
     private static void testNDimensionWSPD() {
         //Generate points
         Set<Point> points = new Set<>();
-        for (int i = 0; i < 3; i++) {
-            points.insert(new Point(new double[]{Math.random(), Math.random()}));
+        for (int i = 0; i < 2; i++) {
+            points.insert(new Point(new double[]{Math.random(),Math.random()}));
+        }
+
+        System.out.println("Points: ");
+        for(Point p : points){
+            System.out.println(p.toString());
         }
 
         SplitTree splitTree = new SplitTree(points, new BoundingBox(points));
@@ -32,8 +37,10 @@ public class HelloProgal {
 
     private static void test2DimensionWSPD() {
         Set<ProGAL.geom2d.Point> points = new PointSet();
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 3; i++)
             points.insert(new ProGAL.geom2d.Point(Math.random(), Math.random()));
+
+
 
         //Display them
         J2DScene scene = J2DScene.createJ2DSceneInFrame();
