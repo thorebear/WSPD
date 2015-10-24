@@ -14,6 +14,10 @@ public class SplitTree {
 
     private SplitTreeNode root;
 
+    public SplitTree(SplitTreeNode root){
+        this.root = root;
+    }
+
     public SplitTree(Set<Point> points, BoundingBox rectangle) {
 
         //root = calcSlowSplitTree(points, rectangle);
@@ -75,8 +79,26 @@ public class SplitTree {
             LS.put(d, new Pair<>(tempLS.get(d).getFirst(), tempLS.get(d).getLast()));
         }
 
-        PartialSplitTree partialSplitTree = new PartialSplitTree(points, rectangle, LS);
-        return null;
+        PartialSplitTree partialSplitTree = new PartialSplitTree(rectangle, LS);
+        for(PartialSplitTree.PartialSplitTreeNode leaf : partialSplitTree.getLeaves(partialSplitTree.root)){
+            computePartialSplitTreeWithoutPreprosessing(leaf);
+        }
+
+        return partialSplitTree.toSplitTree(partialSplitTree.root);
+    }
+
+    private void computePartialSplitTreeWithoutPreprosessing(PartialSplitTree.PartialSplitTreeNode leaf) {
+        // Test if n = 1!
+        if (leaf.getLS().get(0).fst.Next == null){
+            leaf.setBoundingBox(new BoundingBox(leaf.getPoints()));
+        } else {
+            PartialSplitTree leafPartialSplitTree = new PartialSplitTree(leaf.rectangle, leaf.getLS());
+            leaf.leftChild = leafPartialSplitTree.root.leftChild;
+            leaf.rightChild = leafPartialSplitTree.root.rightChild;
+            for(PartialSplitTree.PartialSplitTreeNode l : leafPartialSplitTree.getLeaves(leafPartialSplitTree.root)){
+                computePartialSplitTreeWithoutPreprosessing(l);
+            }
+        }
     }
 
     private SplitTreeNode calcSlowSplitTree(Set<Point> points, BoundingBox rectangle) {
@@ -162,7 +184,16 @@ public class SplitTree {
 
         private PartialSplitTreeNode root;
 
-        public PartialSplitTree(Set<Point> points, BoundingBox rectangle, Map<Integer, Pair<PointWrapper, PointWrapper>> LS) {
+        public PartialSplitTree(BoundingBox rectangle, Map<Integer, Pair<PointWrapper, PointWrapper>> LS) {
+
+            Set<Point> points = new Set<Point>();
+            PointWrapper fs = LS.get(0).fst;
+            points.insert(fs.getPoint());
+            while (fs.Next != null) {
+                points.insert(fs.Next.getPoint());
+                fs = fs.Next;
+            }
+
             int dimension = points.get(0).getDimensions();
 
             /// STEP 1: ///
@@ -185,7 +216,7 @@ public class SplitTree {
                 // Copy all points in d'th dimension, so we have them in CLS
                 // (notice that we do not establish cross pointers, we instead use the originals cross-pointers)
                 PointWrapper p = firstInCLS_d;
-                while(p.Original.Next != null){
+                while (p.Original.Next != null) {
                     PointWrapper cls_next = p.Original.Next.getCleanCopy();
                     p.Next = cls_next;
                     cls_next.Prev = p;
@@ -199,14 +230,24 @@ public class SplitTree {
 
             while (size > n / 2) {
                 /// STEP 3: ///
+                points = new Set<Point>();
+                fs = LS.get(0).fst;
+                points.insert(fs.getPoint());
+                while (fs.Next != null) {
+                    points.insert(fs.Next.getPoint());
+                    fs = fs.Next;
+                }
+
                 BoundingBox boundingBox_u = new BoundingBox(points);
                 u.setBoundingBox(boundingBox_u);
+                u.setPoints(points);
                 int i = boundingBox_u.getDimensionWithMaxLength();
                 double middle = boundingBox_u.getMiddleInDimension(i);
                 PointWrapper p = LS.get(i).fst;
                 PointWrapper p_prime = p.Next;
                 PointWrapper q = LS.get(i).snd;
                 PointWrapper q_prime = q.Prev;
+
                 int size_prime = 1;
                 while (p_prime.getPoint().getCoord(i) <= middle
                         && q_prime.getPoint().getCoord(i) >= middle) {
@@ -245,7 +286,7 @@ public class SplitTree {
                                 continue;
 
                             PointWrapper crossPointer = z.CrossPointers.get(di);
-                            crossPointer.deleteInList(LS,di);
+                            crossPointer.deleteInList(LS, di);
                         }
 
                         z.deleteInList(LS, i);
@@ -302,9 +343,11 @@ public class SplitTree {
             for (int d = 0; d < dimension; d++) {
                 PointWrapper p = LS.get(d).fst;
                 p.Copy.setNode(u);
-                while(p.Next != null){
+                u.addPoint(p.getPoint());
+                while (p.Next != null) {
                     p = p.Next;
                     p.Copy.setNode(u);
+                    u.addPoint(p.getPoint());
                 }
             }
 
@@ -324,11 +367,17 @@ public class SplitTree {
                 PointWrapper pw = CLS.get(d).fst;
                 Map<Integer, Set<PointWrapper>> LS_leaf = LS_leafs.get(pw.Node);
                 LS_leaf.get(d).insert(pw.Original);
+                pw.Original.Copy = null;
+                pw.Original.Next = null;
+                pw.Original.Prev = null;
 
-                while(pw.Next != null){
+                while (pw.Next != null) {
                     pw = pw.Next;
                     LS_leaf = LS_leafs.get(pw.Node);
                     LS_leaf.get(d).insert(pw.Original);
+                    pw.Original.Copy = null;
+                    pw.Original.Next = null;
+                    pw.Original.Prev = null;
                 }
             }
 
@@ -348,17 +397,20 @@ public class SplitTree {
             }
 
             // finally for each leaf compute the bounding box
-            for(int leaf_index = 0; leaf_index < leaves.size(); leaf_index++){
+            for (int leaf_index = 0; leaf_index < leaves.size(); leaf_index++) {
                 PartialSplitTreeNode leaf = leaves.get(leaf_index);
                 Map<Integer, Set<PointWrapper>> LS_leaf = LS_leafs.get(leaf);
+                Map<Integer, Pair<PointWrapper, PointWrapper>> LS_leaf_endpoints = new HashMap<>();
 
                 // Since the points are sorted, we only need the first and the last point in each dimension,
                 // to compute the bounding box:
                 Set<Point> pointsNeedForBB = new Set<>();
-                for(int d = 0; d < dimension; d++){
+                for (int d = 0; d < dimension; d++) {
                     pointsNeedForBB.insert(LS_leaf.get(d).getFirst().getPoint());
                     pointsNeedForBB.insert(LS_leaf.get(d).getLast().getPoint());
+                    LS_leaf_endpoints.put(d, new Pair<>(LS_leaf.get(d).getFirst(), LS_leaf.get(d).getLast()));
                 }
+                leaf.setLS(LS_leaf_endpoints);
                 leaf.setBoundingBox(new BoundingBox(pointsNeedForBB));
             }
         }
@@ -390,11 +442,35 @@ public class SplitTree {
             return leaves;
         }
 
+        public SplitTreeNode toSplitTree(PartialSplitTreeNode p_node) {
+            if (p_node.boundingBox == null){
+                throw new RuntimeException("Should have bounding box defined");
+            }
+            SplitTreeNode node = new SplitTreeNode(p_node.boundingBox, null, p_node.getPoints());
+
+            if (p_node.leftChild != null){
+                if (p_node.leftChild.boundingBox == null){
+                    throw new RuntimeException("Child should have bounding box defined");
+                }
+                node.setLeftChild(this.toSplitTree(p_node.leftChild));
+            }
+
+            if (p_node.rightChild != null){
+                if (p_node.rightChild.boundingBox == null){
+                    throw new RuntimeException("Child should have bounding box defined");
+                }
+                node.setRightChild(this.toSplitTree(p_node.rightChild));
+            }
+            return node;
+        }
+
         private class PartialSplitTreeNode {
             private final BoundingBox rectangle;
             private PartialSplitTreeNode rightChild;
             private PartialSplitTreeNode leftChild;
             private BoundingBox boundingBox;
+            private Map<Integer, Pair<PointWrapper, PointWrapper>> LS;
+            private Set<Point> points;
 
             public PartialSplitTreeNode(BoundingBox rectangle) {
                 this.rectangle = rectangle;
@@ -410,6 +486,41 @@ public class SplitTree {
 
             public void setBoundingBox(BoundingBox boundingBox) {
                 this.boundingBox = boundingBox;
+            }
+
+            public void setLS(Map<Integer, Pair<PointWrapper,PointWrapper>> ls){
+                this.LS = ls;
+            }
+
+            public Map<Integer, Pair<PointWrapper,PointWrapper>> getLS(){
+                return LS;
+            }
+
+            public void setPoints(Set<Point> points){
+                this.points = points;
+            }
+
+            public Set<Point> getPoints(){
+                if (points != null){
+                    return points;
+                } else {
+                    Set<Point> set = new Set<Point>();
+                    PointWrapper fs = LS.get(0).fst;
+                    set.insert(fs.getPoint());
+                    while (fs.Next != null) {
+                        set.insert(fs.Next.getPoint());
+                        fs = fs.Next;
+                    }
+
+                    return set;
+                }
+            }
+
+            public void addPoint(Point point) {
+                if (points == null){
+                    points = new Set<Point>();
+                }
+                points.insert(point);
             }
         }
     }

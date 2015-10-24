@@ -21,13 +21,13 @@ public class HelloProgal {
     private static void testNDimensionWSPD() {
         //Generate points
         Set<Point> points = new Set<>();
-        for (int i = 0; i < 20000; i++) {
+        for (int i = 0; i < 20; i++) {
             points.insert(new Point(new double[]{Math.random(),Math.random(),Math.random(),Math.random(),Math.random(),Math.random()}));
         }
 
         SplitTree splitTree = new SplitTree(points, new BoundingBox(points));
-        //WellSeparatedPairDecomposition wspd = new WellSeparatedPairDecomposition(splitTree, 0.3);
-        //System.out.print(wspd.toString());
+        WellSeparatedPairDecomposition wspd = new WellSeparatedPairDecomposition(splitTree, 0.3);
+        System.out.print(wspd.toString());
     }
 
     private static void test2DimensionWSPD() {

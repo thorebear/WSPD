@@ -64,4 +64,12 @@ public class SplitTreeNode {
         }
         return nodes;
     }
+
+    public void setLeftChild(SplitTreeNode leftChild) {
+        this.leftChild = leftChild;
+    }
+
+    public void setRightChild(SplitTreeNode rightChild) {
+        this.rightChild = rightChild;
+    }
 }
