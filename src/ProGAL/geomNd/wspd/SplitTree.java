@@ -18,10 +18,12 @@ public class SplitTree {
         this.root = root;
     }
 
-    public SplitTree(Set<Point> points, BoundingBox rectangle) {
-
-        //root = calcSlowSplitTree(points, rectangle);
-        root = calcFastSplitTree(points, rectangle);
+    public SplitTree(Set<Point> points, BoundingBox rectangle, boolean fastAlgorithm) {
+        if (!fastAlgorithm) {
+            root = calcSlowSplitTree(points, rectangle);
+        } else {
+            root = calcFastSplitTree(points, rectangle);
+        }
     }
 
     private SplitTreeNode calcFastSplitTree(Set<Point> points, BoundingBox rectangle) {
@@ -91,6 +93,8 @@ public class SplitTree {
         // Test if n = 1!
         if (leaf.getLS().get(0).fst.Next == null){
             leaf.setBoundingBox(new BoundingBox(leaf.getPoints()));
+            //leaf.points = null;
+            //leaf.addPoint(leaf.getLS().get(0).fst.point);
         } else {
             PartialSplitTree leafPartialSplitTree = new PartialSplitTree(leaf.rectangle, leaf.getLS());
             leaf.leftChild = leafPartialSplitTree.root.leftChild;
@@ -186,7 +190,7 @@ public class SplitTree {
 
         public PartialSplitTree(BoundingBox rectangle, Map<Integer, Pair<PointWrapper, PointWrapper>> LS) {
 
-            Set<Point> points = new Set<Point>();
+            Set<Point> points = new Set<>();
             PointWrapper fs = LS.get(0).fst;
             points.insert(fs.getPoint());
             while (fs.Next != null) {
@@ -230,7 +234,7 @@ public class SplitTree {
 
             while (size > n / 2) {
                 /// STEP 3: ///
-                points = new Set<Point>();
+                points = new Set<>();
                 fs = LS.get(0).fst;
                 points.insert(fs.getPoint());
                 while (fs.Next != null) {
@@ -343,11 +347,9 @@ public class SplitTree {
             for (int d = 0; d < dimension; d++) {
                 PointWrapper p = LS.get(d).fst;
                 p.Copy.setNode(u);
-                u.addPoint(p.getPoint());
                 while (p.Next != null) {
                     p = p.Next;
                     p.Copy.setNode(u);
-                    u.addPoint(p.getPoint());
                 }
             }
 
@@ -411,16 +413,24 @@ public class SplitTree {
                     LS_leaf_endpoints.put(d, new Pair<>(LS_leaf.get(d).getFirst(), LS_leaf.get(d).getLast()));
                 }
                 leaf.setLS(LS_leaf_endpoints);
+
+                points = new Set<>();
+                fs = LS_leaf_endpoints.get(0).fst;
+                points.insert(fs.getPoint());
+                while (fs.Next != null) {
+                    points.insert(fs.Next.getPoint());
+                    fs = fs.Next;
+                }
+                leaf.setPoints(points);
                 leaf.setBoundingBox(new BoundingBox(pointsNeedForBB));
             }
         }
 
         private List<PartialSplitTreeNode> getLeaves(PartialSplitTreeNode root) {
-            PartialSplitTreeNode a = root;
             List<PartialSplitTreeNode> leaves = new ArrayList<>();
 
             List<PartialSplitTreeNode> layer = new ArrayList<>();
-            layer.add(a);
+            layer.add(root);
             while(!layer.isEmpty()) {
                 List<PartialSplitTreeNode> newLayer = new ArrayList<>();
                 for (PartialSplitTreeNode node : layer) {
@@ -504,7 +514,7 @@ public class SplitTree {
                 if (points != null){
                     return points;
                 } else {
-                    Set<Point> set = new Set<Point>();
+                    Set<Point> set = new Set<>();
                     PointWrapper fs = LS.get(0).fst;
                     set.insert(fs.getPoint());
                     while (fs.Next != null) {
@@ -514,13 +524,6 @@ public class SplitTree {
 
                     return set;
                 }
-            }
-
-            public void addPoint(Point point) {
-                if (points == null){
-                    points = new Set<Point>();
-                }
-                points.insert(point);
             }
         }
     }
