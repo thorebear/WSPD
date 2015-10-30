@@ -15,22 +15,19 @@ public class SplitTreeNode {
     private SplitTreeNode leftChild;
     private SplitTreeNode rightChild;
     private BoundingBox boundingBox;
-    private BoundingBox rectangle;
 
-    public SplitTreeNode(BoundingBox boundingBox, BoundingBox rectangle, Set<Point> points) {
+    public SplitTreeNode(BoundingBox boundingBox, Set<Point> points) {
         leftChild = null;
         rightChild = null;
         this.boundingBox = boundingBox;
-        this.rectangle = rectangle;
         this.points = points;
     }
 
     public SplitTreeNode(SplitTreeNode leftChild, SplitTreeNode rightChild,
-                     BoundingBox boundingBox, BoundingBox rectangle, Set<Point> points) {
+                     BoundingBox boundingBox, Set<Point> points) {
         this.leftChild = leftChild;
         this.rightChild = rightChild;
         this.boundingBox = boundingBox;
-        this.rectangle = rectangle;
         this.points = points;
     }
 
@@ -46,28 +43,7 @@ public class SplitTreeNode {
         return boundingBox;
     }
 
-    public BoundingBox getRetangle() {
-        return rectangle;
-    }
-
     public Set<Point> getPoints() { return points; }
-
-    public void toScene(J2DScene scene, Color color) {
-//        Color nxtLevelColor = new Color((int)(Math.random() * 0x1000000));
-//        if (leftChild != null)
-//            leftChild.toScene(scene, nxtLevelColor);
-//
-//        if (rightChild != null)
-//            rightChild.toScene(scene, nxtLevelColor);
-
-        boundingBox.toScene(scene, color);
-        rectangle.toScene(scene, color);
-
-        rectangle.getSplitLine(rectangle.getDimensionWithMaxLength()).toScene(scene, 3,Color.GRAY, 0.01);
-
-        rightChild.boundingBox.toScene(scene, color);
-        leftChild.boundingBox.toScene(scene, color);
-    }
 
     // Gets all internal nodes in the subtree with root in this node.
     public List<SplitTreeNode> getAllInternalNodes()

@@ -6,8 +6,6 @@ import ProGAL.geom2d.*;
 import ProGAL.geom2d.viewer.J2DScene;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class BoundingBox {
 
@@ -134,16 +132,7 @@ public class BoundingBox {
 
     public ProGAL.geom2d.Point getLeftTop() { return leftTop; }
     public ProGAL.geom2d.Point getLeftBottom() { return leftBottom; }
-    public ProGAL.geom2d.Point getRightTop() { return rightTop; }
     public ProGAL.geom2d.Point getRightBottom() { return rightBottom; }
-    public List<ProGAL.geom2d.Point> getAllCorners() {
-        return new ArrayList<ProGAL.geom2d.Point>() {{
-            add(leftTop);
-            add(leftBottom);
-            add(rightTop);
-            add(rightBottom);
-        }};
-    }
 
     public double getMaxLength() {
         return Math.max((rightTop.x() - leftTop.x()), (leftTop.y() - leftBottom.y()));

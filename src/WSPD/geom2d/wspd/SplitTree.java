@@ -6,9 +6,7 @@ import WSPD.geom2d.BoundingBox;
 import ProGAL.geom2d.Line;
 import ProGAL.geom2d.Point;
 import ProGAL.geom2d.PointSet;
-import ProGAL.geom2d.viewer.J2DScene;
 
-import java.awt.*;
 import java.util.List;
 
 public class SplitTree {
@@ -22,7 +20,7 @@ public class SplitTree {
     private SplitTreeNode calcSlowSplitTree(Set<Point> points, BoundingBox rectangle) {
         BoundingBox boundingBox = new BoundingBox(points);
         if (points.getSize() == 1){
-            return new SplitTreeNode(boundingBox, rectangle, points);
+            return new SplitTreeNode(boundingBox, points);
         } else {
             int i = boundingBox.getDimensionWithMaxLength();
             Line splitLine = boundingBox.getSplitLine(i);
@@ -43,17 +41,11 @@ public class SplitTree {
             SplitTreeNode v = calcSlowSplitTree(S1, R1);
             SplitTreeNode w = calcSlowSplitTree(S2, R2);
 
-            return new SplitTreeNode(v, w, boundingBox, rectangle, points);
+            return new SplitTreeNode(v, w, boundingBox, points);
         }
     }
 
-    public SplitTreeNode getRoot(){ return root; }
-
     public List<SplitTreeNode> getAllInternalNodes() {
         return root.getAllInternalNodes();
-    }
-
-    public void toScene(J2DScene scene){
-        root.toScene(scene, Color.BLACK);
     }
 }

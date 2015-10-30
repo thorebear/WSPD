@@ -14,10 +14,6 @@ public class SplitTree {
 
     private SplitTreeNode root;
 
-    public SplitTree(SplitTreeNode root){
-        this.root = root;
-    }
-
     public SplitTree(Set<Point> points, BoundingBox rectangle, boolean fastAlgorithm) {
         if (!fastAlgorithm) {
             root = calcSlowSplitTree(points, rectangle);
@@ -33,7 +29,7 @@ public class SplitTree {
         int dimension = points.get(0).getDimensions();
 
         Map<Integer,Pair<PointWrapper, PointWrapper>> LS = new HashMap<>();
-        // Preprocessing step
+        // Pre-processing step
 
         Map<Integer, Set<PointWrapper>> tempLS = new HashMap<>();
         // 1: Make the list for points
@@ -83,13 +79,13 @@ public class SplitTree {
 
         PartialSplitTree partialSplitTree = new PartialSplitTree(rectangle, LS);
         for(PartialSplitTree.PartialSplitTreeNode leaf : partialSplitTree.getLeaves(partialSplitTree.root)){
-            computePartialSplitTreeWithoutPreprosessing(leaf);
+            computePartialSplitTreeWithoutPrepossessing(leaf);
         }
 
         return partialSplitTree.toSplitTree(partialSplitTree.root);
     }
 
-    private void computePartialSplitTreeWithoutPreprosessing(PartialSplitTree.PartialSplitTreeNode leaf) {
+    private void computePartialSplitTreeWithoutPrepossessing(PartialSplitTree.PartialSplitTreeNode leaf) {
         // Test if n = 1!
         if (leaf.getLS().get(0).fst.Next == null){
             leaf.setBoundingBox(new BoundingBox(leaf.getPoints()));
@@ -100,7 +96,7 @@ public class SplitTree {
             leaf.leftChild = leafPartialSplitTree.root.leftChild;
             leaf.rightChild = leafPartialSplitTree.root.rightChild;
             for(PartialSplitTree.PartialSplitTreeNode l : leafPartialSplitTree.getLeaves(leafPartialSplitTree.root)){
-                computePartialSplitTreeWithoutPreprosessing(l);
+                computePartialSplitTreeWithoutPrepossessing(l);
             }
         }
     }
@@ -274,9 +270,9 @@ public class SplitTree {
 
                 if (p_prime.getPoint().getCoord(i) >= middle) {
                     /// STEP 4: ///
-                    boolean p_encounted = false;
+                    boolean p_encountered = false;
                     PointWrapper z = LS.get(i).fst;
-                    while (!p_encounted) {
+                    while (!p_encountered) {
                         for (PointWrapper pw : z.CrossPointers.values()) {
                             pw.Copy.setNode(v);
                         }
@@ -296,7 +292,7 @@ public class SplitTree {
                         z.deleteInList(LS, i);
 
                         if (z.equals(p)) {
-                            p_encounted = true;
+                            p_encountered = true;
                         } else {
                             z = z.Next;
                         }
@@ -308,9 +304,9 @@ public class SplitTree {
 
                 } else {
                     /// STEP 5: ///
-                    boolean q_encounted = false;
+                    boolean q_encountered = false;
                     PointWrapper z = LS.get(i).snd;
-                    while (!q_encounted) {
+                    while (!q_encountered) {
 
                         for (PointWrapper pw : z.CrossPointers.values()) {
                             pw.Copy.setNode(w);
@@ -331,7 +327,7 @@ public class SplitTree {
                         z.deleteInList(LS, i);
 
                         if (z.equals(q)) {
-                            q_encounted = true;
+                            q_encountered = true;
                         } else {
                             z = z.Prev;
                         }
