@@ -1,6 +1,7 @@
-package ProGAL.dataStructures;
+package WSPD.dataStructures;
 
-import ProGAL.geomNd.wspd.SplitTree;
+import ProGAL.dataStructures.SortTool;
+import WSPD.geomNd.wspd.SplitTree;
 
 public class SortToolPointInDimension implements SortTool {
     private final int dimension;

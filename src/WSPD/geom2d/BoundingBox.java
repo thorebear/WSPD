@@ -1,7 +1,8 @@
-package ProGAL.geom2d;
+package WSPD.geom2d;
 
 import ProGAL.dataStructures.Pair;
 import ProGAL.dataStructures.Set;
+import ProGAL.geom2d.*;
 import ProGAL.geom2d.viewer.J2DScene;
 
 import java.awt.*;
@@ -10,10 +11,10 @@ import java.util.List;
 
 public class BoundingBox {
 
-    private Point leftTop, leftBottom, rightTop, rightBottom;
+    private ProGAL.geom2d.Point leftTop, leftBottom, rightTop, rightBottom;
 
-    public BoundingBox(Point leftTop, Point leftBottom,
-                       Point rightTop, Point rightBottom)
+    public BoundingBox(ProGAL.geom2d.Point leftTop, ProGAL.geom2d.Point leftBottom,
+                       ProGAL.geom2d.Point rightTop, ProGAL.geom2d.Point rightBottom)
     {
         this.leftTop = leftTop;
         this.leftBottom = leftBottom;
@@ -21,7 +22,7 @@ public class BoundingBox {
         this.rightBottom = rightBottom;
     }
 
-    public BoundingBox(Set<Point> points) {
+    public BoundingBox(Set<ProGAL.geom2d.Point> points) {
         double leftBound, topBound, rightBound, bottomBound;
         if(points.isEmpty()){
             throw new IllegalArgumentException(
@@ -36,17 +37,17 @@ public class BoundingBox {
 
         // Iterates through the rest of the points, to find the bounds
         for(int i = 1; i < points.getSize(); i++){
-            Point p = points.get(i);
+            ProGAL.geom2d.Point p = points.get(i);
             leftBound = Math.min(p.x(), leftBound);
             rightBound = Math.max(p.x(), rightBound);
             bottomBound = Math.min(p.y(), bottomBound);
             topBound = Math.max(p.y(), topBound);
         }
 
-        leftTop = new Point(leftBound, topBound);
-        leftBottom = new Point(leftBound, bottomBound);
-        rightTop = new Point(rightBound, topBound);
-        rightBottom = new Point(rightBound, bottomBound);
+        leftTop = new ProGAL.geom2d.Point(leftBound, topBound);
+        leftBottom = new ProGAL.geom2d.Point(leftBound, bottomBound);
+        rightTop = new ProGAL.geom2d.Point(rightBound, topBound);
+        rightBottom = new ProGAL.geom2d.Point(rightBound, bottomBound);
     }
 
     public void toScene(J2DScene scene, Color col) {
@@ -65,22 +66,22 @@ public class BoundingBox {
         }
     }
 
-    public boolean contains(Point p){
+    public boolean contains(ProGAL.geom2d.Point p){
         return leftTop.x() <= p.x() && p.x() <= rightTop.x() && leftBottom.y() <= p.y() && p.y() <= leftTop.y();
     }
 
     public Line getSplitLine(int dimension) {
         if (dimension == 0){
-            return new Line(new Point((rightTop.x() + leftTop.x()) / 2, 0),
+            return new Line(new ProGAL.geom2d.Point((rightTop.x() + leftTop.x()) / 2, 0),
                     new Vector(1, 0.0D));
         } else {
-            return new Line(new Point(0, (leftTop.y() + leftBottom.y()) / 2),
+            return new Line(new ProGAL.geom2d.Point(0, (leftTop.y() + leftBottom.y()) / 2),
                     new Vector(0.0D, 1));
         }
     }
 
     public Pair<BoundingBox, BoundingBox> split(Line splitLine) {
-        if (splitLine.n.y() == 0.0D){
+        if (splitLine.isVertical()){
 
             if (splitLine.getPoint().x() < leftBottom.x() ||
                     splitLine.getPoint().x() > rightBottom.x())
@@ -92,20 +93,20 @@ public class BoundingBox {
             BoundingBox left = new BoundingBox(
                 leftTop,
                 leftBottom,
-                new Point(splitLine.getPoint().x(), rightTop.y()),
-                new Point(splitLine.getPoint().x(), rightBottom.y())
+                new ProGAL.geom2d.Point(splitLine.getPoint().x(), rightTop.y()),
+                new ProGAL.geom2d.Point(splitLine.getPoint().x(), rightBottom.y())
             );
 
             BoundingBox right = new BoundingBox(
-                new Point(splitLine.getPoint().x(), leftTop.y()),
-                new Point(splitLine.getPoint().x(), leftBottom.y()),
+                new ProGAL.geom2d.Point(splitLine.getPoint().x(), leftTop.y()),
+                new ProGAL.geom2d.Point(splitLine.getPoint().x(), leftBottom.y()),
                 rightTop,
                 rightBottom
             );
 
             return new Pair<>(left, right);
 
-        } else if (splitLine.n.x() == 0.0D){
+        } else {
 
             if (splitLine.getPoint().y() < leftBottom.y() ||
                     splitLine.getPoint().y() > leftTop.y())
@@ -115,31 +116,28 @@ public class BoundingBox {
 
             BoundingBox top = new BoundingBox(
                 leftTop,
-                new Point(leftBottom.x(), splitLine.getPoint().y()),
+                new ProGAL.geom2d.Point(leftBottom.x(), splitLine.getPoint().y()),
                 rightTop,
-                new Point(rightBottom.x(), splitLine.getPoint().y())
+                new ProGAL.geom2d.Point(rightBottom.x(), splitLine.getPoint().y())
             );
 
             BoundingBox bottom = new BoundingBox(
-                new Point(leftTop.x(), splitLine.getPoint().y()),
+                new ProGAL.geom2d.Point(leftTop.x(), splitLine.getPoint().y()),
                 leftBottom,
-                new Point(rightTop.x(), splitLine.getPoint().y()),
+                new ProGAL.geom2d.Point(rightTop.x(), splitLine.getPoint().y()),
                 rightBottom
             );
 
             return new Pair<>(top, bottom);
-        } else {
-            throw new IllegalArgumentException(
-                "A bounding box can only be split by a vertical or horizontal line");
         }
     }
 
-    public Point getLeftTop() { return leftTop; }
-    public Point getLeftBottom() { return leftBottom; }
-    public Point getRightTop() { return rightTop; }
-    public Point getRightBottom() { return rightBottom; }
-    public List<Point> getAllCorners() {
-        return new ArrayList<Point>() {{
+    public ProGAL.geom2d.Point getLeftTop() { return leftTop; }
+    public ProGAL.geom2d.Point getLeftBottom() { return leftBottom; }
+    public ProGAL.geom2d.Point getRightTop() { return rightTop; }
+    public ProGAL.geom2d.Point getRightBottom() { return rightBottom; }
+    public List<ProGAL.geom2d.Point> getAllCorners() {
+        return new ArrayList<ProGAL.geom2d.Point>() {{
             add(leftTop);
             add(leftBottom);
             add(rightTop);

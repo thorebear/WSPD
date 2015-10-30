@@ -1,8 +1,8 @@
-package ProGAL.geom2d.wspd;
+package WSPD.geom2d.wspd;
 
 import ProGAL.dataStructures.Pair;
 import ProGAL.dataStructures.Set;
-import ProGAL.geom2d.BoundingBox;
+import WSPD.geom2d.BoundingBox;
 import ProGAL.geom2d.Line;
 import ProGAL.geom2d.Point;
 import ProGAL.geom2d.PointSet;

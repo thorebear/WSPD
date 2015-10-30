@@ -1,10 +1,10 @@
-package ProGAL.geomNd.wspd;
+package WSPD.geomNd.wspd;
 
 import ProGAL.dataStructures.*;
-import ProGAL.geomNd.BoundingBox;
+import WSPD.dataStructures.SortToolPointInDimension;
+import WSPD.geomNd.BoundingBox;
 import ProGAL.geomNd.Point;
 
-import java.rmi.UnexpectedException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -283,7 +283,7 @@ public class SplitTree {
 
                         z.Copy.setNode(v);
 
-                        // We have to go to sizes + 1, because we don't have a cross pointers to the dimension with
+                        // We have to go to sizes + 1, because we don't have a cross pointers to the dimension
                         // we are in.
                         for (int di = 0; di < z.CrossPointers.size() + 1; di++) {
                             if (di == i)

@@ -1,10 +1,11 @@
-package ProGAL.geom2d.wspd;
+package WSPD.geom2d.wspd;
 
 import ProGAL.dataStructures.Pair;
 import ProGAL.dataStructures.Set;
 import ProGAL.geom2d.*;
 import ProGAL.geom2d.Point;
 import ProGAL.geom2d.viewer.J2DScene;
+import WSPD.geom2d.BoundingBox;
 
 import java.awt.*;
 import java.util.ArrayList;

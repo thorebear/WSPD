@@ -1,8 +1,8 @@
-package ProGAL.geomNd.wspd;
+package WSPD.geomNd.wspd;
 
 import ProGAL.dataStructures.Pair;
 import ProGAL.dataStructures.Set;
-import ProGAL.geomNd.BoundingBox;
+import WSPD.geomNd.BoundingBox;
 import ProGAL.geomNd.HyperSphere;
 import ProGAL.geomNd.Point;
 

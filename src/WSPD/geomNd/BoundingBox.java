@@ -1,7 +1,8 @@
-package ProGAL.geomNd;
+package WSPD.geomNd;
 
 import ProGAL.dataStructures.Pair;
 import ProGAL.dataStructures.Set;
+import ProGAL.geomNd.Point;
 
 import java.util.*;
 
